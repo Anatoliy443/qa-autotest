@@ -23,3 +23,31 @@ java {
 test {
     useJUnitPlatform()
 }
+
+// Задача 1. Эта Gradle-задача запускает все JUnit-тесты проекта.
+tasks.register('runAllTests', Test) {
+    description = 'Запускает все тесты проекта'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+
+    // Показываем в консоли строки, напечатанные через System.out.println.
+    testLogging {
+        showStandardStreams = true
+    }
+
+    // После завершения тестов автоматически запускается вторая задача.
+    finalizedBy 'testRunIsOver'
+}
+
+// Задача 2. Выполняется после runAllTests и печатает итоговую строку.
+tasks.register('testRunIsOver') {
+    description = 'Печатает сообщение после завершения всех тестов'
+    group = 'verification'
+
+    doLast {
+        println 'Test run is over'
+    }
+}
