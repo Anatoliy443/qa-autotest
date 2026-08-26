@@ -21,7 +21,31 @@ java {
 }
 
 test {
-    useJUnitPlatform()
+    // Фильтрация по тегу: запускаются тесты домашней работы №3.
+    // Намеренно падающий учебный тест исключён из обычного успешного запуска.
+    useJUnitPlatform {
+        includeTags 'homework3'
+        excludeTags 'expected-failure'
+    }
+}
+
+// Отдельная задача демонстрирует информативное сообщение падающего ассерта.
+// Эта задача ожидаемо завершается с ошибкой, потому что actual намеренно неверный.
+tasks.register('runExpectedFailure', Test) {
+    description = 'Запускает намеренно падающий тест с информативным assert'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'expected-failure'
+    }
+
+    testLogging {
+        events 'failed'
+        exceptionFormat 'full'
+        showStandardStreams = true
+    }
 }
 
 // Задача 1. Эта Gradle-задача запускает все JUnit-тесты проекта.
@@ -31,7 +55,11 @@ tasks.register('runAllTests', Test) {
 
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
-    useJUnitPlatform()
+    // Та же фильтрация по тегу добавлена в пользовательскую задачу запуска.
+    useJUnitPlatform {
+        includeTags 'homework3'
+        excludeTags 'expected-failure'
+    }
 
     // Показываем в консоли строки, напечатанные через System.out.println.
     testLogging {

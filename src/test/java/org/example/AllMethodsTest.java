@@ -1,7 +1,7 @@
 package org.example;
 
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -14,63 +14,62 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Задача 2. Этот класс проверяет все 12 методов первой домашней работы.
- * Assert не используется: результат проверяется через if и выводится
- * строка TEST PASSED или TEST FAILED.
- *
- * Распределение аннотаций:
- * 4 метода с @Test, 4 с @RepeatedTest и 4 с @ParameterizedTest.
+ * В теме «Assertion» проверки через if заменены информативными ассертами.
+ * Каждый тестовый метод запускается не менее 10 раз.
  */
+@Tag("homework3")
 class AllMethodsTest {
     private static final Random RANDOM = new Random();
 
-    // -------------------- Четыре обычных теста @Test --------------------
-
-    /** Задача 1: проверка чётности случайного числа. */
-    @Test
+    /** Задача 1: проверка чётности случайного числа, 10 запусков. */
+    @RepeatedTest(10)
     void testIsEven() {
         int number = randomInt(-100, 100);
         boolean expected = number % 2 == 0;
         boolean actual = App.isEven(number);
 
-        printResult(actual == expected);
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
     /** Задача 2: проверка доступа для случайного возраста. */
-    @Test
+    @RepeatedTest(10)
     void testCheckAccess() {
         int age = randomInt(0, 99);
         String expected = age > 18 ? "Allowed" : "Denied";
         String actual = App.checkAccess(age);
 
-        printResult(expected.equals(actual));
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
     /** Задача 3: проверка случайного положительного или отрицательного числа. */
-    @Test
+    @RepeatedTest(10)
     void testIsPositive() {
         int number = randomInt(-100, 100);
         boolean expected = number >= 0;
         boolean actual = App.isPositive(number);
 
-        printResult(actual == expected);
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
     /** Задача 4: получение оценки для случайного количества баллов. */
-    @Test
+    @RepeatedTest(10)
     void testGetGrade() {
         int score = randomInt(-10, 110);
         String expected = expectedGrade(score);
         String actual = App.getGrade(score);
 
-        printResult(expected.equals(actual));
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
     // ---------------- Четыре повторных теста @RepeatedTest ----------------
 
-    /** Задача 5: обратный отсчёт проверяется три раза со случайным стартом. */
-    @RepeatedTest(3)
+    /** Задача 5: обратный отсчёт проверяется 10 раз со случайным стартом. */
+    @RepeatedTest(10)
     void testBlastOff() {
         int start = randomInt(1, 10);
         StringBuilder expected = new StringBuilder();
@@ -80,21 +79,22 @@ class AllMethodsTest {
         expected.append("Поехали!");
 
         String actual = App.blastOff(start);
-        printResult(expected.toString().equals(actual));
+        assertEquals(expected.toString(), actual,
+                assertionMessage(expected.toString(), actual));
     }
 
-    /** Задача 6: сумма от 1 до случайного n проверяется три раза. */
-    @RepeatedTest(3)
+    /** Задача 6: сумма от 1 до случайного n проверяется 10 раз. */
+    @RepeatedTest(10)
     void testSumToN() {
         int number = randomInt(1, 100);
         int expected = number * (number + 1) / 2;
         int actual = App.sumToN(number);
 
-        printResult(actual == expected);
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
-    /** Задача 7: три раза создаётся новый случайный массив сообщений. */
-    @RepeatedTest(3)
+    /** Задача 7: 10 раз создаётся новый случайный массив сообщений. */
+    @RepeatedTest(10)
     void testHasBug() {
         boolean addBug = RANDOM.nextBoolean();
         String[] messages = addBug
@@ -102,18 +102,18 @@ class AllMethodsTest {
                 : new String[]{"Done", "Fixed", "Ready"};
 
         boolean actual = App.hasBug(messages);
-        printResult(actual == addBug);
+        assertEquals(addBug, actual, assertionMessage(addBug, actual));
     }
 
-    /** Задача 8: три раза создаются новые границы диапазона. */
-    @RepeatedTest(3)
+    /** Задача 8: 10 раз создаются новые границы диапазона. */
+    @RepeatedTest(10)
     void testGetEvenInRange() {
         int start = randomInt(-20, 20);
         int end = start + randomInt(0, 20);
         String expected = expectedEvenNumbers(start, end);
         String actual = App.getEvenInRange(start, end);
 
-        printResult(expected.equals(actual));
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
     // ------------ Четыре параметризованных теста @ParameterizedTest ------------
@@ -125,7 +125,7 @@ class AllMethodsTest {
         int expected = Arrays.stream(numbers).max().orElseThrow();
         int actual = App.findMax(numbers);
 
-        printResult(actual == expected);
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
     /** Задача 10: проверка переворота нескольких массивов строк. */
@@ -138,7 +138,8 @@ class AllMethodsTest {
         }
 
         String[] actual = App.reverse(words);
-        printResult(Arrays.equals(expected, actual));
+        assertArrayEquals(expected, actual,
+                assertionMessage(Arrays.toString(expected), Arrays.toString(actual)));
     }
 
     /** Задача 11: проверка среднего арифметического случайных списков. */
@@ -148,7 +149,7 @@ class AllMethodsTest {
         double expected = numbers.stream().mapToInt(Integer::intValue).average().orElseThrow();
         double actual = App.calcAverage(numbers);
 
-        printResult(Double.compare(actual, expected) == 0);
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
     /** Задача 12: проверка удаления имени из нескольких списков. */
@@ -164,16 +165,15 @@ class AllMethodsTest {
         }
 
         List<String> actual = App.removeSpecificName(names, nameToRemove);
-        printResult(expected.equals(actual));
+        assertEquals(expected, actual, assertionMessage(expected, actual));
     }
 
-    /** Печатает результат проверки вместо использования assert. */
-    private static void printResult(boolean passed) {
-        if (passed) {
-            System.out.println("TEST PASSED");
-        } else {
-            System.out.println("TEST FAILED");
-        }
+    /**
+     * Формирует информативное сообщение для любого ассерта.
+     * Если проверка упадёт, будет видно ожидаемое и фактическое значения.
+     */
+    private static String assertionMessage(Object expected, Object actual) {
+        return "Ожидалось: " + expected + "; фактически получено: " + actual;
     }
 
     /** Возвращает случайное число, включая обе переданные границы. */
@@ -210,7 +210,7 @@ class AllMethodsTest {
     }
 
     static Stream<int[]> randomIntegerArrays() {
-        return Stream.generate(() -> RANDOM.ints(5, -100, 101).toArray()).limit(4);
+        return Stream.generate(() -> RANDOM.ints(5, -100, 101).toArray()).limit(10);
     }
 
     static Stream<Arguments> randomStringArrays() {
@@ -220,19 +220,19 @@ class AllMethodsTest {
                 .toArray(String[]::new))
                 // Arguments.of сообщает JUnit, что весь String[] — один параметр теста.
                 .map(words -> Arguments.of((Object) words))
-                .limit(4);
+                .limit(10);
     }
 
     static Stream<List<Integer>> randomNumberLists() {
         return Stream.generate(() -> RANDOM.ints(5, -50, 51)
                 .boxed()
-                .collect(Collectors.toList())).limit(4);
+                .collect(Collectors.toList())).limit(10);
     }
 
     static Stream<List<String>> randomNameLists() {
         String[] availableNames = {"Анна", "Иван", "Олег", "Мария"};
         return Stream.generate(() -> IntStream.range(0, 6)
                 .mapToObj(index -> availableNames[RANDOM.nextInt(availableNames.length)])
-                .collect(Collectors.toList())).limit(4);
+                .collect(Collectors.toList())).limit(10);
     }
 }
