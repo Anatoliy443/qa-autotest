@@ -5,12 +5,12 @@
 
 ## Требования
 
-- JDK 14+
-- Gradle 7.6+
+- JDK 17+ для запуска Gradle Wrapper и учебного API (проверено на JDK 25).
+- Gradle устанавливается автоматически через `gradlew`. Исходный код совместим с Java 14.
 
 ## Запуск всех тестов с итоговым сообщением
 
-Задача `runAllTests` запускает все JUnit-тесты. После неё автоматически
+Задача `runAllTests` запускает тесты домашней работы №3 с тегом `homework3`. После неё автоматически
 выполняется `testRunIsOver`, которая выводит `Test run is over`.
 
 macOS/Linux:
@@ -51,3 +51,29 @@ Windows:
 
 Задача `runExpectedFailure` должна завершиться с ошибкой. В сообщении будет
 указано ожидаемое и фактическое значение.
+
+
+## Домашнее задание №4: REST Assured
+
+[Инструкция, покрытие и результаты](docs/homework4.md).
+
+1. Запустить учебный API с пустой базой в отдельном терминале:
+
+   ```shell
+   bash scripts/start-training-api.sh "$HOME/Downloads/oa_at_train_project-1.0-SNAPSHOT.jar.zip"
+   ```
+
+2. Указать пароль учебного администратора и запустить все API-тесты:
+
+   ```shell
+   read -s API_PASSWORD
+   export API_PASSWORD
+   ./gradlew apiTest
+   ```
+
+Swagger: <http://127.0.0.1:8080/swagger-ui/index.html>.
+HTML-отчёт: `build/reports/tests/apiTest/index.html`.
+
+В предоставленной версии API найден дефект: GET отсутствующего товара возвращает
+500 вместо 404. Поэтому один тест **должен упасть до исправления API**;
+ожидание 404 сохранено согласно Swagger. Подробности в [отчёте](docs/homework4.md).
